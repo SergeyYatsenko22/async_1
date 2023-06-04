@@ -37,10 +37,11 @@ def draw(canvas):
 
     while True:
         try:
-            curses.curs_set(False)
-            coroutine.send(None)
-            time.sleep(0.3)
-            canvas.refresh()
+            for delay in (2, 0.3, 0.5, 0.3):
+                curses.curs_set(False)
+                coroutine.send(None)
+                time.sleep(delay)
+                canvas.refresh()
 
         except StopIteration:
             break
