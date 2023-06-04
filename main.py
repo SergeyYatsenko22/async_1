@@ -56,6 +56,8 @@ async def blink(canvas, row, column, symbol='*'):
 
         canvas.addstr(row, column, symbol)
         await asyncio.sleep(0)
+        
+        time.sleep(10)
 
 
 if __name__ == '__main__':
