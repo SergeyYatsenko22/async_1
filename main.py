@@ -28,9 +28,8 @@ import asyncio
 #         time.sleep(0.3)
 
 
-def draw(row=1, column=1):
-    curses.update_lines_cols()
-    coroutine = curses.wrapper(blink(row=row, column=column))
+def draw(canvas):
+    coroutine = blink(canvas=canvas, row=2, column=22)
 
     print(coroutine)
     print(type(coroutine))
@@ -42,23 +41,28 @@ def draw(row=1, column=1):
         except StopIteration:
             break
 
+    time.sleep(10)
+
 
 async def blink(canvas, row, column, symbol='*'):
     while True:
+        curses.curs_set(False)
+
         canvas.addstr(row, column, symbol, curses.A_DIM)
-        await asyncio.sleep(0)
+        print("1")
+        await asyncio.sleep(2)
 
         canvas.addstr(row, column, symbol)
-        await asyncio.sleep(0)
+        print("2")
+        await asyncio.sleep(0.3)
 
         canvas.addstr(row, column, symbol, curses.A_BOLD)
-        await asyncio.sleep(0)
+        await asyncio.sleep(0.5)
 
         canvas.addstr(row, column, symbol)
-        await asyncio.sleep(0)
-        
-        time.sleep(10)
+        await asyncio.sleep(0.3)
 
 
 if __name__ == '__main__':
-    draw(5, 22)
+    curses.update_lines_cols()
+    curses.wrapper(draw)
