@@ -31,36 +31,37 @@ import asyncio
 def draw(canvas):
     coroutine = blink(canvas=canvas, row=2, column=22)
 
-    print(coroutine)
-    print(type(coroutine))
-    print(dir(coroutine))
+    # print(coroutine)
+    # print(type(coroutine))
+    # print(dir(coroutine))
 
     while True:
         try:
+            curses.curs_set(False)
             coroutine.send(None)
+            time.sleep(0.3)
+            canvas.refresh()
+
         except StopIteration:
             break
 
-    time.sleep(10)
+    time.sleep(3)
 
 
 async def blink(canvas, row, column, symbol='*'):
-    while True:
-        curses.curs_set(False)
+    # while True:
 
-        canvas.addstr(row, column, symbol, curses.A_DIM)
-        print("1")
-        await asyncio.sleep(2)
+    canvas.addstr(row, column, symbol, curses.A_DIM)
+    await asyncio.sleep(0)
 
-        canvas.addstr(row, column, symbol)
-        print("2")
-        await asyncio.sleep(0.3)
+    canvas.addstr(row, column, symbol)
+    await asyncio.sleep(0)
 
-        canvas.addstr(row, column, symbol, curses.A_BOLD)
-        await asyncio.sleep(0.5)
+    canvas.addstr(row, column, symbol, curses.A_BOLD)
+    await asyncio.sleep(0)
 
-        canvas.addstr(row, column, symbol)
-        await asyncio.sleep(0.3)
+    canvas.addstr(row, column, symbol)
+    await asyncio.sleep(0)
 
 
 if __name__ == '__main__':
