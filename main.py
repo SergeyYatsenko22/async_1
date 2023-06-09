@@ -1,6 +1,7 @@
 import time
 import curses
 import asyncio
+import random
 
 
 # def draw(canvas):
@@ -27,44 +28,66 @@ import asyncio
 #         canvas.refresh()
 #         time.sleep(0.3)
 
+async def blink(canvas, row, column, symbol="*"):
+    while True:
+
+        canvas.addstr(row, column, symbol, curses.A_DIM)
+        for delay in range(20):
+            await asyncio.sleep(0)
+
+        canvas.addstr(row, column, symbol)
+        for delay in range(4):
+            await asyncio.sleep(0)
+
+        canvas.addstr(row, column, symbol, curses.A_BOLD)
+        for delay in range(6):
+            await asyncio.sleep(0)
+
+        canvas.addstr(row, column, symbol)
+        for delay in range(4):
+            await asyncio.sleep(0)
+
 
 def draw(canvas):
-    coroutine = blink(canvas=canvas, row=2, column=22)
+    print(curses.window.getmaxyx(canvas)[0])
+    star_field = []
+    coroutines = []
+    star_count = 0
+    while star_count < 15:
+        row_index = random.randint(1, curses.window.getmaxyx(canvas)[0] - 1)
+        column_index = random.randint(1, curses.window.getmaxyx(canvas)[1] - 1)
+        coords = (row_index, column_index)
+
+        if coords not in star_field:
+            star_symbol = random.choice('+*.:')
+            star_field.append(coords)
+            star_count += 1
+            coroutines.append(blink(canvas=canvas, row=row_index, column=column_index, symbol=star_symbol))
+        else:
+            continue
+
+    # print (coroutines)
+
+    # time.sleep(100)
 
     # print(coroutine)
     # print(type(coroutine))
     # print(dir(coroutine))
 
     while True:
-        try:
-            for delay in (2, 0.3, 0.5, 0.3):
-                curses.curs_set(False)
+        curses.curs_set(False)
+        for coroutine in coroutines.copy():
+            try:
                 coroutine.send(None)
-                time.sleep(delay)
+                time.sleep(0.1)
                 canvas.refresh()
-
-        except StopIteration:
+            except StopIteration:
+                coroutines.remove(coroutine)
+        if len(coroutines) == 0:
             break
-
-    time.sleep(3)
-
-
-async def blink(canvas, row, column, symbol='*'):
-    # while True:
-
-    canvas.addstr(row, column, symbol, curses.A_DIM)
-    await asyncio.sleep(0)
-
-    canvas.addstr(row, column, symbol)
-    await asyncio.sleep(0)
-
-    canvas.addstr(row, column, symbol, curses.A_BOLD)
-    await asyncio.sleep(0)
-
-    canvas.addstr(row, column, symbol)
-    await asyncio.sleep(0)
 
 
 if __name__ == '__main__':
     curses.update_lines_cols()
     curses.wrapper(draw)
+
