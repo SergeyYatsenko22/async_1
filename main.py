@@ -32,19 +32,19 @@ async def blink(canvas, row, column, symbol="*"):
     while True:
 
         canvas.addstr(row, column, symbol, curses.A_DIM)
-        for delay in range(20):
+        for delay in range(random.randint(2, 10)):
             await asyncio.sleep(0)
 
         canvas.addstr(row, column, symbol)
-        for delay in range(4):
+        for delay in range(1, 4):
             await asyncio.sleep(0)
 
         canvas.addstr(row, column, symbol, curses.A_BOLD)
-        for delay in range(6):
+        for delay in range(1, 6):
             await asyncio.sleep(0)
 
         canvas.addstr(row, column, symbol)
-        for delay in range(4):
+        for delay in range(1, 4):
             await asyncio.sleep(0)
 
 
@@ -53,7 +53,7 @@ def draw(canvas):
     star_field = []
     coroutines = []
     star_count = 0
-    while star_count < 15:
+    while star_count < 20:
         row_index = random.randint(1, curses.window.getmaxyx(canvas)[0] - 1)
         column_index = random.randint(1, curses.window.getmaxyx(canvas)[1] - 1)
         coords = (row_index, column_index)
@@ -79,7 +79,7 @@ def draw(canvas):
         for coroutine in coroutines.copy():
             try:
                 coroutine.send(None)
-                time.sleep(0.1)
+                time.sleep(0.01)
                 canvas.refresh()
             except StopIteration:
                 coroutines.remove(coroutine)
