@@ -13,9 +13,6 @@ async def rocket(canvas, start_row, start_column, frames):
 
         draw_frame(canvas, start_row, start_column, frame, negative=True)
         continue
-        draw_frame(canvas, start_row, start_column, frame)
-        canvas.refresh()
-        await asyncio.sleep(0)
 
 
 def draw_frame(canvas, start_row, start_column, frame, negative=False):
