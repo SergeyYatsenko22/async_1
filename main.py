@@ -2,11 +2,54 @@ import time
 import curses
 import asyncio
 import random
+from itertools import cycle
 
 
-async def fire(canvas, start_row, start_column, rows_speed=-0.3, columns_speed=0):
-    """Display animation of gun shot, direction and speed can be specified."""
+async def rocket(canvas, start_row, start_column, frames):
+    for frame in cycle(frames):
+        draw_frame(canvas, start_row, start_column, frame)
+        canvas.refresh()
+        await asyncio.sleep(0)
 
+        draw_frame(canvas, start_row, start_column, frame, negative=True)
+        continue
+        draw_frame(canvas, start_row, start_column, frame)
+        canvas.refresh()
+        await asyncio.sleep(0)
+
+
+def draw_frame(canvas, start_row, start_column, frame, negative=False):
+    rows_number, columns_number = canvas.getmaxyx()
+
+    for row, line in enumerate(frame.splitlines(), round(start_row)):
+        if row < 0:
+            continue
+
+        if row >= rows_number:
+            break
+
+        for column, symbol in enumerate(line, round(start_column)):
+            if column < 0:
+                continue
+
+            if column >= columns_number:
+                break
+
+            if symbol == ' ':
+                continue
+
+            if row == rows_number - 1 and column == columns_number - 1:
+                continue
+
+            symbol = symbol if not negative else ' '
+            canvas.addch(row, column, symbol)
+
+
+async def fire(canvas,
+               start_row,
+               start_column,
+               rows_speed=-0.3,
+               columns_speed=0):
     row, column = start_row, start_column
 
     canvas.addstr(round(row), round(column), '*')
@@ -33,30 +76,6 @@ async def fire(canvas, start_row, start_column, rows_speed=-0.3, columns_speed=0
         row += rows_speed
         column += columns_speed
 
-
-# def draw(canvas):
-#     while True:
-#         curses.curs_set(False)
-
-#         row, column = (5, 20)
-#         canvas.addstr(row, column, '*', curses.A_DIM)
-#         canvas.refresh()
-#         time.sleep(2)
-
-#         row, column = (5, 20)
-#         canvas.addstr(row, column, '*')
-#         canvas.refresh()
-#         time.sleep(0.3)
-
-#         row, column = (5, 20)
-#         canvas.addstr(row, column, '*', curses.A_BOLD)
-#         canvas.refresh()
-#         time.sleep(0.5)
-
-#         row, column = (5, 20)
-#         canvas.addstr(row, column, '*')
-#         canvas.refresh()
-#         time.sleep(0.3)
 
 async def blink(canvas, row, column, symbol="*"):
     while True:
@@ -85,17 +104,28 @@ def draw(canvas):
         try:
             curses.curs_set(False)
             coroutine_gun.send(None)
-            time.sleep(0.1)
+            time.sleep(0.2)
             canvas.refresh()
         except StopIteration:
             break
-    time.sleep(3)
+    time.sleep(1)
 
-    # print(curses.window.getmaxyx(canvas)[0])
+    with open("rocket/shape_1.txt", "r") as file_1:
+        frame_1 = file_1.read()
+
+    with open("rocket/shape_2.txt", "r") as file_2:
+        frame_2 = file_2.read()
+
+    start_row = 14
+    start_column = 30
+    frames = (frame_1, frame_2)
+
+    ship_coroutine = rocket(canvas, start_row, start_column, frames)
+
     star_field = []
-    coroutines = []
+    coroutines = [ship_coroutine]
     star_count = 0
-    while star_count < 20:
+    while star_count < 50:
         row_index = random.randint(1, curses.window.getmaxyx(canvas)[0] - 1)
         column_index = random.randint(1, curses.window.getmaxyx(canvas)[1] - 1)
         coords = (row_index, column_index)
@@ -104,24 +134,29 @@ def draw(canvas):
             star_symbol = random.choice('+*.:')
             star_field.append(coords)
             star_count += 1
-            coroutines.append(blink(canvas=canvas, row=row_index, column=column_index, symbol=star_symbol))
+            coroutines.append(
+                blink(canvas=canvas,
+                      row=row_index,
+                      column=column_index,
+                      symbol=star_symbol))
         else:
             continue
 
     while True:
         curses.curs_set(False)
+
         for coroutine in coroutines.copy():
             try:
                 coroutine.send(None)
-                time.sleep(0.01)
-                canvas.refresh()
             except StopIteration:
                 coroutines.remove(coroutine)
         if len(coroutines) == 0:
             break
 
+        time.sleep(0.1)
+        canvas.refresh()
+
 
 if __name__ == '__main__':
     curses.update_lines_cols()
     curses.wrapper(draw)
-
