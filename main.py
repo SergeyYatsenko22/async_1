@@ -45,8 +45,11 @@ def read_controls(canvas):
 
 async def rocket(canvas, row, column, frames):
     for frame in cycle(frames):
-        draw_frame(canvas, row, column, frame, negative=True)
         cords = read_controls(canvas)
+        draw_frame(canvas, row, column, frame, negative=True)
+        canvas.refresh()
+        time.sleep(0.5)
+
         draw_frame(canvas, row + cords[0], column + cords[1], frame)
         canvas.refresh()
         row = row + cords[0]
