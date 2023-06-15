@@ -46,16 +46,14 @@ def read_controls(canvas):
 async def rocket(canvas, row, column, frames):
     for frame in cycle(frames):
         cords = read_controls(canvas)
-        draw_frame(canvas, row + cords[0], column + cords[1], frame)
-        canvas.refresh()
-        time.sleep(0.1)
+        row = row + cords[0]
+        column = column + cords[1]
+
+        draw_frame(canvas, row, column, frame)
 
         await asyncio.sleep(0)
 
-        draw_frame(canvas, row + cords[0], column + cords[1], frame, negative=True)
-        canvas.refresh()
-        row = row + cords[0]
-        column = column + cords[1]
+        draw_frame(canvas, row, column, frame, negative=True)
         continue
 
 
@@ -190,6 +188,8 @@ def draw(canvas):
         for coroutine in coroutines.copy():
             try:
                 coroutine.send(None)
+                canvas.refresh()
+                time.sleep(0.05)
             except StopIteration:
                 coroutines.remove(coroutine)
         if len(coroutines) == 0:
