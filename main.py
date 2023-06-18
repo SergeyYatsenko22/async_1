@@ -43,11 +43,20 @@ def read_controls(canvas):
     return rows_direction, columns_direction, space_pressed
 
 
-async def rocket(canvas, row, column, frames):
+async def rocket(canvas, row, column, frames, canvas_size=(24, 49), rocket_size=(9, 5)):
     for frame in cycle(frames):
+
         cords = read_controls(canvas)
         row = row + cords[0]
         column = column + cords[1]
+
+        if row not in range(1, (canvas_size[0] - rocket_size[0])):
+            row = row - cords[0]
+            continue
+
+        if column not in range(1, (canvas_size[1] - rocket_size[1])):
+            column = column - cords[1]
+            continue
 
         draw_frame(canvas, row, column, frame)
 
@@ -116,6 +125,15 @@ async def fire(canvas,
         column += columns_speed
 
 
+def get_frame_size(text):
+    """Calculate size of multiline text fragment, return pair — number of rows and colums."""
+
+    lines = text.splitlines()
+    rows = len(lines)
+    columns = max([len(line) for line in lines])
+    return rows, columns
+
+
 async def blink(canvas, row, column, symbol="*"):
     while True:
 
@@ -138,17 +156,17 @@ async def blink(canvas, row, column, symbol="*"):
 
 def draw(canvas):
     canvas.border()
-    # coroutine_gun = fire(canvas, 14, 30)
+    coroutine_gun = fire(canvas, 14, 30)
 
-    # while True:
-    #     try:
-    #         curses.curs_set(False)
-    #         coroutine_gun.send(None)
-    #         time.sleep(0.2)
-    #         canvas.refresh()
-    #     except StopIteration:
-    #         break
-    # time.sleep(1)
+    while True:
+        try:
+            curses.curs_set(False)
+            coroutine_gun.send(None)
+            time.sleep(0.2)
+            canvas.refresh()
+        except StopIteration:
+            break
+    time.sleep(1)
 
     with open("rocket/shape_1.txt", "r") as file_1:
         frame_1 = file_1.read()
@@ -157,10 +175,16 @@ def draw(canvas):
         frame_2 = file_2.read()
 
     start_row = 14
-    start_column = 30
+    start_column = 43
     frames = (frame_1, frame_2)
 
-    ship_coroutine = rocket(canvas, start_row, start_column, frames)
+    canvas_size = canvas.getmaxyx()
+    # (24, 49)
+
+    rocket_size = get_frame_size(frame_1)
+    # (9, 5)
+
+    ship_coroutine = rocket(canvas, start_row, start_column, frames, canvas_size, rocket_size)
 
     star_field = []
     coroutines = [ship_coroutine]
