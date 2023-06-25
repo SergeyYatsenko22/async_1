@@ -185,8 +185,6 @@ def draw(canvas):
     while star_count < 10:
         row_index = random.randint(1, curses.window.getmaxyx(canvas)[0] - 1)
         column_index = random.randint(1, curses.window.getmaxyx(canvas)[1] - 1)
-        coords = (row_index, column_index)
-
         star_symbol = random.choice('+*.:')
         star_count += 1
         coroutines.append(
@@ -202,15 +200,12 @@ def draw(canvas):
         for coroutine in coroutines.copy():
             try:
                 coroutine.send(None)
-                # canvas.refresh()
-                # time.sleep(TIC_TIMEOUT)
             except StopIteration:
                 coroutines.remove(coroutine)
             if len(coroutines) == 0:
                 break
         canvas.refresh()
         time.sleep(TIC_TIMEOUT)
-        # canvas.refresh()
 
 
 if __name__ == '__main__':
