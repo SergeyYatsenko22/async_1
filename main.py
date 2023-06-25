@@ -47,20 +47,20 @@ def read_controls(canvas):
 
 async def rocket(canvas, row, column, frames, canvas_size=(24, 49), rocket_size=(9, 5)):
     for frame in cycle(frames):
+        row_direction, column_direction, pause = read_controls(canvas)
+        canvas_rows, canvas_columns = canvas_size
+        rocket_rows, rocket_columns = rocket_size
+        new_row = row + row_direction
+        new_column = column + column_direction
+
+        if row in range(2, (canvas_rows - rocket_rows - 1)):
+            row = new_row
+
+        if column in range(2, (canvas_columns - rocket_columns - 1)):
+            column = new_column
+
         step = 0
         while step in range(2):
-            row_direction, column_direction, pause = read_controls(canvas)
-            canvas_rows, canvas_columns = canvas_size
-            rocket_rows, rocket_columns = rocket_size
-            new_row = row + row_direction
-            new_column = column + column_direction
-
-            if row in range(2, (canvas_rows - rocket_rows - 1)):
-                row = new_row
-
-            if column in range(2, (canvas_columns - rocket_columns - 1)):
-                column = new_column
-
             draw_frame(canvas, row, column, frame)
 
             await asyncio.sleep(0)
