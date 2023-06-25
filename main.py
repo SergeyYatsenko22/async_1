@@ -46,16 +46,19 @@ def read_controls(canvas):
 async def rocket(canvas, row, column, frames, canvas_size=(24, 49), rocket_size=(9, 5)):
     for frame in cycle(frames):
 
-        cords = read_controls(canvas)
-        row = row + cords[0]
-        column = column + cords[1]
+        # cords = read_controls(canvas)
+        row_direction, column_direction, pause = read_controls(canvas)
+        canvas_rows, canvas_columns = canvas_size
+        rocket_rows, rocket_columns = rocket_size
+        row = row + row_direction
+        column = column + column_direction
 
-        if row not in range(1, (canvas_size[0] - rocket_size[0])):
-            row = row - cords[0]
+        if row not in range(1, (canvas_rows - rocket_rows)):
+            row = row - row_direction
             continue
 
-        if column not in range(1, (canvas_size[1] - rocket_size[1])):
-            column = column - cords[1]
+        if column not in range(1, (canvas_columns - rocket_columns)):
+            column = column - column_direction
             continue
 
         draw_frame(canvas, row, column, frame)
@@ -216,8 +219,8 @@ def draw(canvas):
                 time.sleep(0.05)
             except StopIteration:
                 coroutines.remove(coroutine)
-        if len(coroutines) == 0:
-            break
+            if len(coroutines) == 0:
+                break
 
         # time.sleep(0.1)
         # canvas.refresh()
