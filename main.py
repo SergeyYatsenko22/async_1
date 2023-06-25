@@ -4,6 +4,8 @@ import asyncio
 import random
 from itertools import cycle
 
+TIC_TIMEOUT = 0.1
+
 SPACE_KEY_CODE = 32
 LEFT_KEY_CODE = 260
 RIGHT_KEY_CODE = 261
@@ -141,19 +143,19 @@ async def blink(canvas, row, column, symbol="*"):
     while True:
 
         canvas.addstr(row, column, symbol, curses.A_DIM)
-        for delay in range(random.randint(2, 10)):
+        for delay in range(20):
             await asyncio.sleep(0)
 
         canvas.addstr(row, column, symbol)
-        for delay in range(1, 4):
+        for delay in range(4):
             await asyncio.sleep(0)
 
         canvas.addstr(row, column, symbol, curses.A_BOLD)
-        for delay in range(1, 6):
+        for delay in range(6):
             await asyncio.sleep(0)
 
         canvas.addstr(row, column, symbol)
-        for delay in range(1, 4):
+        for delay in range(4):
             await asyncio.sleep(0)
 
 
@@ -189,25 +191,24 @@ def draw(canvas):
 
     ship_coroutine = rocket(canvas, start_row, start_column, frames, canvas_size, rocket_size)
 
-    star_field = []
+    # star_field = []
     coroutines = [gun_coroutine, ship_coroutine]
+    # coroutines = []
     star_count = 0
-    while star_count < 50:
+    while star_count < 10:
         row_index = random.randint(1, curses.window.getmaxyx(canvas)[0] - 1)
         column_index = random.randint(1, curses.window.getmaxyx(canvas)[1] - 1)
         coords = (row_index, column_index)
 
-        if coords not in star_field:
-            star_symbol = random.choice('+*.:')
-            star_field.append(coords)
-            star_count += 1
-            coroutines.append(
-                blink(canvas=canvas,
-                      row=row_index,
-                      column=column_index,
-                      symbol=star_symbol))
-        else:
-            continue
+        # if coords not in star_field:
+        star_symbol = random.choice('+*.:')
+        # star_field.append(coords)
+        star_count += 1
+        coroutines.append(
+            blink(canvas=canvas,
+                  row=row_index,
+                  column=column_index,
+                  symbol=star_symbol))
 
     while True:
         curses.curs_set(False)
@@ -215,14 +216,14 @@ def draw(canvas):
         for coroutine in coroutines.copy():
             try:
                 coroutine.send(None)
-                canvas.refresh()
-                time.sleep(0.05)
+                # canvas.refresh()
+                # time.sleep(TIC_TIMEOUT)
             except StopIteration:
                 coroutines.remove(coroutine)
             if len(coroutines) == 0:
                 break
-
-        # time.sleep(0.1)
+        canvas.refresh()
+        time.sleep(TIC_TIMEOUT)
         # canvas.refresh()
 
 
