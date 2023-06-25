@@ -156,17 +156,17 @@ async def blink(canvas, row, column, symbol="*"):
 
 def draw(canvas):
     canvas.border()
-    coroutine_gun = fire(canvas, 14, 30)
+    gun_coroutine = fire(canvas, 14, 30)
 
-    while True:
-        try:
-            curses.curs_set(False)
-            coroutine_gun.send(None)
-            time.sleep(0.2)
-            canvas.refresh()
-        except StopIteration:
-            break
-    time.sleep(1)
+    # while True:
+    #     try:
+    #         curses.curs_set(False)
+    #         gun_coroutine.send(None)
+    #         time.sleep(0.2)
+    #         canvas.refresh()
+    #     except StopIteration:
+    #         break
+    # time.sleep(1)
 
     with open("rocket/shape_1.txt", "r") as file_1:
         frame_1 = file_1.read()
@@ -187,7 +187,7 @@ def draw(canvas):
     ship_coroutine = rocket(canvas, start_row, start_column, frames, canvas_size, rocket_size)
 
     star_field = []
-    coroutines = [ship_coroutine]
+    coroutines = [gun_coroutine, ship_coroutine]
     star_count = 0
     while star_count < 50:
         row_index = random.randint(1, curses.window.getmaxyx(canvas)[0] - 1)
@@ -219,7 +219,7 @@ def draw(canvas):
         if len(coroutines) == 0:
             break
 
-        time.sleep(0.1)
+        # time.sleep(0.1)
         canvas.refresh()
 
 
