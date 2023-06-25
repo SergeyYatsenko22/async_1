@@ -139,8 +139,10 @@ def get_frame_size(text):
     return rows, columns
 
 
-async def blink(canvas, row, column, symbol="*"):
+async def blink(canvas, row, column, offset_tics, symbol="*"):
     while True:
+        for delay in range(offset_tics):
+            await asyncio.sleep(0)
 
         canvas.addstr(row, column, symbol, curses.A_DIM)
         for delay in range(20):
@@ -163,16 +165,6 @@ def draw(canvas):
     canvas.border()
     gun_coroutine = fire(canvas, 14, 30)
 
-    # while True:
-    #     try:
-    #         curses.curs_set(False)
-    #         gun_coroutine.send(None)
-    #         time.sleep(0.2)
-    #         canvas.refresh()
-    #     except StopIteration:
-    #         break
-    # time.sleep(1)
-
     with open("rocket/shape_1.txt", "r") as file_1:
         frame_1 = file_1.read()
 
@@ -184,30 +176,26 @@ def draw(canvas):
     frames = (frame_1, frame_2)
 
     canvas_size = canvas.getmaxyx()
-    # (24, 49)
 
     rocket_size = get_frame_size(frame_1)
-    # (9, 5)
 
     ship_coroutine = rocket(canvas, start_row, start_column, frames, canvas_size, rocket_size)
 
-    # star_field = []
     coroutines = [gun_coroutine, ship_coroutine]
-    # coroutines = []
+
     star_count = 0
     while star_count < 10:
         row_index = random.randint(1, curses.window.getmaxyx(canvas)[0] - 1)
         column_index = random.randint(1, curses.window.getmaxyx(canvas)[1] - 1)
         coords = (row_index, column_index)
 
-        # if coords not in star_field:
         star_symbol = random.choice('+*.:')
-        # star_field.append(coords)
         star_count += 1
         coroutines.append(
             blink(canvas=canvas,
                   row=row_index,
                   column=column_index,
+                  offset_tics=random.randint(1, 10),
                   symbol=star_symbol))
 
     while True:
