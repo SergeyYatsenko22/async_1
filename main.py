@@ -220,7 +220,7 @@ def draw(canvas):
             break
 
         # time.sleep(0.1)
-        canvas.refresh()
+        # canvas.refresh()
 
 
 if __name__ == '__main__':
