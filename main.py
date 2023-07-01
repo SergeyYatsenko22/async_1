@@ -5,6 +5,7 @@ import random
 from itertools import cycle
 
 TIC_TIMEOUT = 0.1
+BORDER_WIDTH = 1
 
 SPACE_KEY_CODE = 32
 LEFT_KEY_CODE = 260
@@ -55,10 +56,10 @@ async def rocket(canvas, row, column, frames, canvas_size=(24, 49), rocket_size=
             rocket_rows, rocket_columns = rocket_size
             new_row = row + row_direction
             new_column = column + column_direction
-            if row in range(2, (canvas_rows - rocket_rows - 1)):
+            if row in range(BORDER_WIDTH + 1, (canvas_rows - rocket_rows - BORDER_WIDTH)):
                 row = new_row
 
-            if column in range(2, (canvas_columns - rocket_columns - 1)):
+            if column in range(BORDER_WIDTH + 1, (canvas_columns - rocket_columns - BORDER_WIDTH)):
                 column = new_column
             draw_frame(canvas, row, column, frame)
 
